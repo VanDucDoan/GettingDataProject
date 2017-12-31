@@ -87,8 +87,13 @@ mean_std_data <- Xy_dataset[, grepl("mean", tolower(colnames(Xy_dataset))) |
 # (5) creates a second, independent tidy data set with the average of 
 # each variable for each activity and each subject.
 ####################################################################
-avg_group_data$byActivity <- sapply(split(subset(Xy_dataset, select = -c(subject, activity)), 
-                                          Xy_dataset[, "activity"]), colMeans)
-avg_group_data$bySubject <- sapply(split(subset(Xy_dataset, select = -c(subject, activity)), 
-                                          Xy_dataset[, "subject"]), colMeans)
+library(dplyr)
+validNames <- make.names(names = names(Xy_dataset), 
+                               unique = TRUE, allow_ = TRUE)
+names(Xy_dataset) <- validNames
+groupSubjectActivity <- Xy_dataset %>% 
+    group_by(subject, activity) %>%
+    summarise_all(mean)
+dim(groupSubjectActivity)
+write.table(x = groupSubjectActivity, file = "./groupSubjectActivity.txt")
 ####################################################################

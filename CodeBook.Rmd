@@ -165,15 +165,14 @@ colnames(mean_std_data)
 ## (5) Create a second, independent tidy data set with the average of each variable for each activity and each subject
 ```{r, cache=FALSE, eval=TRUE}
 ####################################################################
-avg_group_data <- list()
-# group by activity
-avg_group_data[[1]] <- sapply(split(subset(Xy_dataset, select = -c(subject, activity)), 
-                                          Xy_dataset[, "activity"]), colMeans)
-
-# group by subject
-avg_group_data[[2]] <- sapply(split(subset(Xy_dataset, select = -c(subject, activity)), 
-                                          Xy_dataset[, "subject"]), colMeans)
-head(avg_group_data[[1]])
-head(avg_group_data[[2]])
+library(dplyr)
+validNames <- make.names(names = names(Xy_dataset), 
+                               unique = TRUE, allow_ = TRUE)
+names(Xy_dataset) <- validNames
+groupSubjectActivity <- Xy_dataset %>% 
+    group_by(subject, activity) %>%
+    summarise_all(mean)
+dim(groupSubjectActivity)
+write.table(x = groupSubjectActivity, file = "./groupSubjectActivity.txt")
 ####################################################################
 ```
